@@ -30,17 +30,24 @@ having AVG(s.quantity * p.price) < (
    join products p2 on s2.product_id = p2.product_id 
 ) 
 order by average_income asc;
-
--- Ingreso total por vendedor y día
-SELECT 
-    CONCAT(e.first_name, ' ', e.last_name) AS seller,
-    TRIM(LOWER(TO_CHAR(s.sale_date, 'Day'))) AS day_of_week,
-    FLOOR(SUM(s.quantity * p.price)) AS income -- Agregamos FLOOR para quitar decimales
-FROM employees e 
-JOIN sales s ON e.employee_id = s.sales_person_id 
-JOIN products p ON s.product_id = p.product_id 
-GROUP BY seller, day_of_week, EXTRACT(ISODOW FROM s.sale_date)
-ORDER BY EXTRACT(ISODOW FROM s.sale_date) ASC, seller ASC;
+-- Ingreso por vendedor por día 
+WITH data AS (
+    SELECT 
+        CONCAT(e.first_name, ' ', e.last_name) AS seller,
+        TRIM(LOWER(TO_CHAR(s.sale_date, 'Day'))) AS day_of_week,
+        s.quantity * p.price AS line_total,
+        EXTRACT(ISODOW FROM s.sale_date) AS day_num
+    FROM employees e 
+    JOIN sales s ON e.employee_id = s.sales_person_id 
+    JOIN products p ON s.product_id = p.product_id
+)
+SELECT 
+    seller,
+    day_of_week,
+    FLOOR(SUM(line_total)) AS income
+FROM data
+GROUP BY day_num, day_of_week, seller
+ORDER BY day_num ASC, seller ASC;
 
 --Esta consulta muestra los clientes por rango de eddad
 --y cuenta el total por grupo 
