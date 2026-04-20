@@ -87,3 +87,14 @@ SELECT
 FROM first_purchases
 WHERE purchase_order = 1 AND price = 0
 ORDER BY customer;
+
+-- 5. Top 10 productos populares
+SELECT p.product_id AS ProductID, SUM(s.quantity) AS Amount
+FROM sales s JOIN products p ON s.product_id = p.product_id
+GROUP BY p.product_id ORDER BY Amount DESC LIMIT 10;
+
+-- 6. Top 10 productos rentables
+SELECT p.product_id AS ProductID, SUM(s.quantity * p.price) AS Amount
+FROM sales s JOIN products p ON s.product_id = p.product_id
+GROUP BY p.product_id ORDER BY Amount DESC LIMIT 10;
+
