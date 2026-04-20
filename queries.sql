@@ -97,21 +97,20 @@ ORDER BY customer;
 
 -- Top 10 productos populares
 SELECT 
-    p.product_id AS "ProductID", 
-    SUM(s.quantity) AS "TotalQuantity" -- Cambiado de Amount a TotalQuantity
-FROM sales s 
-JOIN products p ON s.product_id = p.product_id
-GROUP BY p.product_id 
-ORDER BY "TotalQuantity" DESC 
+    product_id AS "ProductID", 
+    SUM(quantity) AS "TotalQuantity"
+FROM sales
+GROUP BY product_id
+ORDER BY "TotalQuantity" DESC
 LIMIT 10;
 
 -- Top 10 productos rentables
 SELECT 
-    p.product_id AS "ProductID", 
-    FLOOR(SUM(s.quantity * p.price)) AS "Amount" -- Aseguramos que sea entero
-FROM sales s 
+    s.product_id AS "ProductID", 
+    FLOOR(SUM(s.quantity * p.price)) AS "Amount"
+FROM sales s
 JOIN products p ON s.product_id = p.product_id
-GROUP BY p.product_id 
-ORDER BY "Amount" DESC 
+GROUP BY s.product_id
+ORDER BY "Amount" DESC
 LIMIT 10;
 
