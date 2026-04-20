@@ -30,3 +30,16 @@ having AVG(s.quantity * p.price) < (
    join products p2 on s2.product_id = p2.product_id 
 ) 
 order by average_income asc;
+
+--Esta consulta muetra el ingreso total por vendedor y día
+-- ordenado cronológicamente y por nombre 
+
+select 
+   CONCAT(e.first_name, ' ', e.last_name) AS seller,
+   TRIM(LOWER(TO_CHAR(s.sale_date, 'Day'))) as day_of_week,
+   floor(SUM(s.quantity * p.price)) as income
+from employees e 
+join sales s on e.employee_id = s.sales_person_id 
+join products p on s.product_id = p.product_id 
+group by seller, day_of_week, extract(DOW from s.sale_date)
+order by extract(DOW from s.sale_date) asc, seller asc;
