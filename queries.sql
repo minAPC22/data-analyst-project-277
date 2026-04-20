@@ -31,14 +31,14 @@ having AVG(s.quantity * p.price) < (
 ) 
 order by average_income asc;
 
--- Ingreso total por vendedor y día (Orden cronológico Lunes-Domingo)
-SELECT 
-    CONCAT(e.first_name, ' ', e.last_name) AS seller,
-    TRIM(LOWER(TO_CHAR(s.sale_date, 'Day'))) AS day_of_week,
-    SUM(s.quantity * p.price) AS income
-FROM employees e 
-JOIN sales s ON e.employee_id = s.sales_person_id 
-JOIN products p ON s.product_id = p.product_id 
+-- Ingreso total por vendedor y día
+SELECT 
+    CONCAT(e.first_name, ' ', e.last_name) AS seller,
+    TRIM(LOWER(TO_CHAR(s.sale_date, 'Day'))) AS day_of_week,
+    FLOOR(SUM(s.quantity * p.price)) AS income -- Agregamos FLOOR para quitar decimales
+FROM employees e 
+JOIN sales s ON e.employee_id = s.sales_person_id 
+JOIN products p ON s.product_id = p.product_id 
 GROUP BY seller, day_of_week, EXTRACT(ISODOW FROM s.sale_date)
 ORDER BY EXTRACT(ISODOW FROM s.sale_date) ASC, seller ASC;
 
@@ -88,13 +88,23 @@ FROM first_purchases
 WHERE purchase_order = 1 AND price = 0
 ORDER BY customer;
 
--- 5. Top 10 productos populares
-SELECT p.product_id AS ProductID, SUM(s.quantity) AS Amount
-FROM sales s JOIN products p ON s.product_id = p.product_id
-GROUP BY p.product_id ORDER BY Amount DESC LIMIT 10;
+-- Top 10 productos populares
+SELECT 
+    p.product_id AS "ProductID", 
+    SUM(s.quantity) AS "TotalQuantity" -- Cambiado de Amount a TotalQuantity
+FROM sales s 
+JOIN products p ON s.product_id = p.product_id
+GROUP BY p.product_id 
+ORDER BY "TotalQuantity" DESC 
+LIMIT 10;
 
--- 6. Top 10 productos rentables
-SELECT p.product_id AS ProductID, SUM(s.quantity * p.price) AS Amount
-FROM sales s JOIN products p ON s.product_id = p.product_id
-GROUP BY p.product_id ORDER BY Amount DESC LIMIT 10;
+-- Top 10 productos rentables
+SELECT 
+    p.product_id AS "ProductID", 
+    FLOOR(SUM(s.quantity * p.price)) AS "Amount" -- Aseguramos que sea entero
+FROM sales s 
+JOIN products p ON s.product_id = p.product_id
+GROUP BY p.product_id 
+ORDER BY "Amount" DESC 
+LIMIT 10;
 
