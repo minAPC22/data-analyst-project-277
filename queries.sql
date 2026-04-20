@@ -56,3 +56,13 @@ select
  from customers 
  group by age_category 
  order by age_category; 
+
+--Agrupa las ventas por año-mes y suma los ingresos 
+select 
+   TO_CHAR(s.sale_date, 'YYYY-MM') as selling_month,
+   COUNT(distinct s.customer_id) as total_cuatomers,
+   floor(SUM(s.quantity * p.price)) as income 
+from sales s 
+join products p on s.product_id = p.product_id 
+group by selling_month 
+order by selling_month asc;
