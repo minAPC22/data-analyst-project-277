@@ -75,10 +75,10 @@ SELECT
     sub.seller
 FROM (
     SELECT
-        CONCAT(c.first_name, ' ', c.last_name) AS customer,
         s.sale_date,
-        CONCAT(e.first_name, ' ', e.last_name) AS seller,
         p.price,
+        CONCAT(c.first_name, ' ', c.last_name) AS customer,
+        CONCAT(e.first_name, ' ', e.last_name) AS seller,
         ROW_NUMBER() OVER (
             PARTITION BY s.customer_id
             ORDER BY s.sale_date ASC
